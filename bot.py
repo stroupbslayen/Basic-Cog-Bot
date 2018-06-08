@@ -3,7 +3,7 @@ from pathlib import Path
 import asyncio
 import discord
 from discord.ext import commands
-from cogs.utils import Pyson, MakeConfig, checks, BotConfig, syscheck
+from cogs.utils import Pyson, MakeConfig, checks, syscheck
 
 syscheck()
 
@@ -11,9 +11,6 @@ syscheck()
 config_path = Path('cogs/data/config.json')
 if not os.path.isfile(config_path):
     MakeConfig(str(config_path))
-
-config = Pyson(str(config_path))
-settings = BotConfig(config.data)
 
 
 class Utils:
@@ -51,7 +48,7 @@ class Utils:
     async def unload(self, cog: str = None):
         ''': Unload an extension'''
         try:
-            for extension in settings.startup_extensions:
+            for extension in bot.startup_extensions:
                 if cog in extension:
                     self.bot.unload_extension(extension)
                     await self.bot.say('Unloaded Extension: '+cog)
@@ -87,25 +84,35 @@ class Utils:
 async def boot():
     while not bot.is_closed:
         try:
-            await bot.start(settings.token)
-        except Exception:
+            await bot.start(bot.token)
+        except Exception as e:
+            print(f'Error: {e}\nRetrying Connection')
             print('Connection lost, retrying...')
             await asyncio.sleep(5)
 
+# load bot settings
+def load_settings():
+    bot.config = Pyson(str(config_path))
+    bot.reboot = True
+    bot.startup_extensions = []
+    bot.command_prefix = bot.config.data.get('Bot Settings').get('command_prefix')
+    bot.description = bot.config.data.get('Bot Settings').get('description')
+    bot.pm_help = bot.config.data.get('Bot Settings').get('pm_help')
+    bot.token = bot.config.data.get('token')
 
 # pull all extensions from the cogs folder
 def load_extensions():
-    settings.startup_extensions = []
+    bot.startup_extensions = []
     path = Path('./cogs')
     for dirpath, dirnames, filenames in os.walk(path):
         if dirpath.strip('./') == str(path):
             for cog in filenames:
-                settings.startup_extensions.append(
+                bot.startup_extensions.append(
                     ('cogs.'+cog).strip('.py'))
 
     # load cogs from extensions
     if __name__ == "__main__":
-        for extension in settings.startup_extensions:
+        for extension in bot.startup_extensions:
             try:
                 bot.load_extension(extension)
                 print('Loaded {}'.format(extension))
@@ -114,10 +121,9 @@ def load_extensions():
                 print('Failed to load extension {}\n{}'.format(extension, exc))
 
 
-while settings.reboot:
-    config = Pyson(str(config_path))
-    settings = BotConfig(config.data)
-    bot = commands.Bot(**settings.bot_settings)
-    bot.add_cog(Utils(bot))
+while True:
+    bot = commands.Bot(command_prefix='')
+    load_settings()
     load_extensions()
+    bot.add_cog(Utils(bot))
     bot.loop.run_until_complete(boot())

@@ -12,6 +12,10 @@ config_path = Path('cogs/data/config.json')
 if not os.path.isfile(config_path):
     MakeConfig(str(config_path))
 
+# dummy class to get the bot started...
+class bot:
+    reboot = True
+
 
 class Utils:
     '''Some useful utils for the discord bot'''
@@ -38,7 +42,7 @@ class Utils:
     async def shutdown(self):
         ''': Shutdown the bot'''
         await bot.say('Shutting Down!')
-        settings.reboot = False
+        bot.reboot = False
         await self.bot.logout()
         await self.bot.close()
 
@@ -60,7 +64,7 @@ class Utils:
     @commands.command()
     async def load(self, cog: str = None):
         ''': Load an extension'''
-        try:        
+        try:
             self.bot.load_extension('cogs.'+cog)
             await self.bot.say('Loaded Extension: '+cog)
         except:
@@ -72,7 +76,7 @@ class Utils:
     async def _reload(self, cog: str = None):
         ''': Reload an extension'''
         try:
-            extension='cogs.'+cog
+            extension = 'cogs.'+cog
             self.bot.unload_extension(extension)
             self.bot.load_extension(extension)
             await self.bot.say('Reloaded Extension: '+cog)
@@ -91,16 +95,21 @@ async def boot():
             await asyncio.sleep(5)
 
 # load bot settings
+
+
 def load_settings():
     bot.config = Pyson(str(config_path))
     bot.reboot = True
     bot.startup_extensions = []
-    bot.command_prefix = bot.config.data.get('Bot Settings').get('command_prefix')
+    bot.command_prefix = bot.config.data.get(
+        'Bot Settings').get('command_prefix')
     bot.description = bot.config.data.get('Bot Settings').get('description')
     bot.pm_help = bot.config.data.get('Bot Settings').get('pm_help')
     bot.token = bot.config.data.get('token')
 
 # pull all extensions from the cogs folder
+
+
 def load_extensions():
     bot.startup_extensions = []
     path = Path('./cogs')
@@ -121,7 +130,7 @@ def load_extensions():
                 print('Failed to load extension {}\n{}'.format(extension, exc))
 
 
-while True:
+while bot.reboot:
     bot = commands.Bot(command_prefix='')
     load_settings()
     load_extensions()

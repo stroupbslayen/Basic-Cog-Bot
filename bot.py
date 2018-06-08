@@ -7,6 +7,9 @@ from cogs.utils import Pyson, MakeConfig, checks, syscheck
 
 syscheck()
 
+if not os.path.isdir('cogs/data'):
+    os.makedirs('cogs/data')
+
 # Check if a config file exists
 config_path = Path('cogs/data/config.json')
 if not os.path.isfile(config_path):

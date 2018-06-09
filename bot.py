@@ -3,7 +3,7 @@ from pathlib import Path
 import asyncio
 import discord
 from discord.ext import commands
-from cogs.utils import Pyson, MakeConfig, checks, syscheck
+from cogs.utils import Pyson, MakeConfig, checks, syscheck, log_error
 
 syscheck()
 
@@ -14,6 +14,7 @@ if not os.path.isdir('cogs/data'):
 config_path = Path('cogs/data/config.json')
 if not os.path.isfile(config_path):
     MakeConfig(str(config_path))
+
 
 # dummy class to get the bot started...
 class bot:
@@ -102,8 +103,8 @@ async def boot():
 
 def load_settings():
     bot.config = Pyson(str(config_path))
-    bot.reboot = True
     bot.startup_extensions = []
+    bot.reboot = True
     bot.command_prefix = bot.config.data.get(
         'Bot Settings').get('command_prefix')
     bot.description = bot.config.data.get('Bot Settings').get('description')
@@ -114,8 +115,8 @@ def load_settings():
 
 
 def load_extensions():
-    bot.startup_extensions = []
     path = Path('./cogs')
+
     for dirpath, dirnames, filenames in os.walk(path):
         if dirpath.strip('./') == str(path):
             for cog in filenames:
@@ -138,4 +139,14 @@ while bot.reboot:
     load_settings()
     load_extensions()
     bot.add_cog(Utils(bot))
+    bot.load_extension('cogs.utils.logger')
+
+    @bot.event
+    async def on_error(event, *args, **kwargs):
+        try:
+            raise
+        except Exception as error:
+            print(error)
+            await log_error(error, event, *args, **kwargs)
+
     bot.loop.run_until_complete(boot())

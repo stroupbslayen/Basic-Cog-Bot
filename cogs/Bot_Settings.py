@@ -19,7 +19,7 @@ class Bot_Settings():
 
     @checks.is_owner()
     @commands.command()
-    async def change_description(self, *, description: str = ''):
+    async def change_description(self, *, description: str=''):
         ''': Change the description for the bot displayed in the help menu'''
         self.bot.description = description
         self.bot.config.data['Bot Settings']['description'] = description

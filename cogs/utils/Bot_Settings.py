@@ -1,7 +1,7 @@
 import discord
 import os
 from discord.ext import commands
-from .utils import checks
+from . import checks
 
 
 class Bot_Settings():

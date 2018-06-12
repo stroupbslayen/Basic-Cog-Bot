@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from pathlib import Path
 import asyncio
 import discord
@@ -9,6 +10,7 @@ syscheck()
 
 if not os.path.isdir('cogs/data'):
     os.makedirs('cogs/data')
+
 
 # Check if a config file exists
 config_path = Path('cogs/data/config.json')
@@ -21,11 +23,21 @@ class bot:
     reboot = True
 
 
+base_extensions = {
+
+    'Bot_Logging': 'cogs.utils.logger',
+    'Bot_Settings': 'cogs.utils.Bot_Settings',
+    'Utils': './'
+
+}
+
+
 class Utils:
     '''Some useful utils for the discord bot'''
 
     def __init__(self, bot):
         self.bot = bot
+        self.bot.starttime = datetime.now()
 
     async def on_ready(self):
         print('Logged in as: '+self.bot.user.name)
@@ -55,11 +67,12 @@ class Utils:
     @commands.command()
     async def unload(self, cog: str = None):
         ''': Unload an extension'''
+        if cog in base_extensions:
+            await bot.say('Cannot unload a base extension')
+            return
         try:
-            for extension in bot.startup_extensions:
-                if cog in extension:
-                    self.bot.unload_extension(extension)
-                    await self.bot.say('Unloaded Extension: '+cog)
+            self.bot.unload_extension('cogs.'+cog)
+            await self.bot.say('Unloaded Extension: '+cog)
         except:
             await self.bot.say('Invalid Extension Name!')
 
@@ -87,6 +100,15 @@ class Utils:
         except:
             await self.bot.say('Invalid Extension Name!')
 
+    @commands.command()
+    async def uptime(self):
+        ''': See how long I've been online'''
+        time = datetime.now() - self.bot.starttime
+        days = time.days
+        hours, remainder = divmod(time.seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        await bot.say(f"I've been online for {days} days, {minutes} min, {seconds} seconds!")
+
 
 # auto reconnect
 async def boot():
@@ -98,9 +120,8 @@ async def boot():
             print('Connection lost, retrying...')
             await asyncio.sleep(5)
 
+
 # load bot settings
-
-
 def load_settings():
     bot.config = Pyson(str(config_path))
     bot.startup_extensions = []
@@ -111,17 +132,24 @@ def load_settings():
     bot.pm_help = bot.config.data.get('Bot Settings').get('pm_help')
     bot.token = bot.config.data.get('token')
 
+
+def load_base_extensions():
+    for extension in base_extensions.values():
+        try:
+            bot.load_extension(extension)
+        except:
+            pass
+
+
 # pull all extensions from the cogs folder
-
-
 def load_extensions():
     path = Path('./cogs')
-
     for dirpath, dirnames, filenames in os.walk(path):
         if dirpath.strip('./') == str(path):
             for cog in filenames:
-                bot.startup_extensions.append(
-                    ('cogs.'+cog).strip('.py'))
+                extension = 'cogs.'+cog[:-3]
+                if extension not in base_extensions.values():
+                    bot.startup_extensions.append(extension)
 
     # load cogs from extensions
     if __name__ == "__main__":
@@ -137,9 +165,9 @@ def load_extensions():
 while bot.reboot:
     bot = commands.Bot(command_prefix='')
     load_settings()
-    load_extensions()
+    load_base_extensions()
     bot.add_cog(Utils(bot))
-    bot.load_extension('cogs.utils.logger')
+    load_extensions()
 
     @bot.event
     async def on_error(event, *args, **kwargs):
@@ -148,5 +176,4 @@ while bot.reboot:
         except Exception as error:
             print(error)
             await log_error(error, event, *args, **kwargs)
-
     bot.loop.run_until_complete(boot())

@@ -1,7 +1,6 @@
 import os
 from .pyson import Pyson
 import logging
-from datetime import datetime
 import discord
 from discord.ext import commands
 from . import checks
@@ -66,7 +65,9 @@ class Bot_Logging:
 
     async def on_command_error(self, error, ctx):
         print(error)
-        await self.bot.senf_message(ctx.message.channel, f'ERROR: ```{error}```')
+        embed = discord.Embed(
+            title='Error', description=str(error), color=0xff0000)
+        await self.bot.send_message(ctx.message.channel, embed=embed)
         if self.bot.logging.data['log_command_error']:
             LOGS = logging.getLogger('discord.command.error')
             LOGS.warning(f'Server_id: {ctx.message.server.id} '

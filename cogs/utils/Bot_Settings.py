@@ -38,6 +38,46 @@ class Bot_Settings():
         else:
             await self.bot.say('The help menu will be posted locally.')
 
+    @checks.is_owner()
+    @commands.command()
+    async def add_coowner(self, member: discord.Member=None):
+        ': Add a co-owner to your server'
+        config = self.bot.config
+        if member is None:
+            return
+        else:
+            if 'coowners' not in config.data:
+                config.data['coowners'] = []
+            if member.id not in config.data['coowners']:
+                config.data['coowners'].append(member.id)
+                config.save()
+                await self.bot.say(f'{member.mention} has been added as a co-owner!')
+
+    @checks.is_owner()
+    @commands.command()
+    async def remove_coowner(self, member: discord.Member=None):
+        ': Remove a co-owner from your server'
+        config = self.bot.config
+        if member is None:
+            return
+        else:
+            if 'coowners' not in config.data:
+                config.data['coowners'] = []
+            if member.id in config.data['coowners']:
+                config.data['coowners'].remove(member.id)
+                config.save()
+                await self.bot.say(f'{member.mention} has been removed from co-owners!')
+
+    @checks.is_coowner()
+    @commands.command(pass_context=True)
+    async def coowners(self, ctx):
+        ': Check the co-owners of the server'
+        coowners = ''
+        for coowner in self.bot.config.data.get('coowners', []):
+            coowners += f'{ctx.message.server.get_member(coowner).mention}\n'
+        embed = discord.Embed(title='Co-Owners', description=coowners)
+        await self.bot.say(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Bot_Settings(bot))

@@ -11,8 +11,6 @@ from cogs.utils import Pyson, MakeConfig, checks, syscheck, log_error
 syscheck()
 
 
-
-
 # Check if a config file exists
 config_path = Path('cogs/data/config.json')
 if not os.path.isfile(config_path):

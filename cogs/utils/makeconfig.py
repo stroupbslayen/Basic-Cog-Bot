@@ -15,6 +15,7 @@ class MakeConfig:
             'token': self.token,
             'Bot Settings': {
                 'command_prefix': self.prefix,
+                'coowners': [],
                 'description': self.description,
                 'pm_help': self.pm_help
             }

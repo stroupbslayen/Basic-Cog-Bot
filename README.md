@@ -4,7 +4,7 @@ Basically, I wanted to make a bot that doesn't require much though for new peopl
 
 # Getting Started
 - Clone the repo and install the requirements with `pip`.
-- Get your discord create a bot app and get the login token [here](https://discordapp.com/developers/applications/).
+- Create a bot app and get the login token [here](https://discordapp.com/developers/applications/).
 - You can either run `bot.py` directly or using the `.bat` or `.sh` files. The `.sh` file will need to be executable.
 - Put in your discord token when asked and confirm your settings. These will only be asked first time it's booted, settings can be changed with commands.
 - That should be it, you've successfully started the Basic Cog Bot. 👍

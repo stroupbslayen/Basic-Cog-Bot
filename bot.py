@@ -7,6 +7,7 @@ import discord
 if not os.path.isdir('cogs/data'):
     os.makedirs('cogs/data')
 from cogs.utils import Pyson, MakeConfig, checks, syscheck, log_error, Bot_Logging, Bot_Settings
+import aiohttp
 
 syscheck()
 
@@ -19,6 +20,15 @@ if not os.path.isfile(config_path):
 settings = Pyson(str(config_path))
 
 bot = commands.Bot(**settings.data.get('Bot Settings'))
+
+
+@bot.event
+async def on_error(event, *args, **kwargs):
+    try:
+        raise
+    except Exception as error:
+        tb = traceback.format_exc()
+        await log_error(error, event, tb=tb, **kwargs)
 
 
 class Utils:
@@ -111,10 +121,14 @@ def load_extensions():
         for extension in bot.startup_extensions:
             try:
                 bot.load_extension(extension)
-                print('Loaded {}'.format(extension))
+                print(f'Loaded {extension}')
             except Exception as e:
-                exc = '{}: {}'.format(type(e).__name__, e)
-                print('Failed to load extension {}\n{}'.format(extension, exc))
+                print(f'Failed to load extension {extension}\n{e}')
+
+
+# create an aiohttp session that cogs can use
+async def create_aiohttp():
+    bot.aiohttp = aiohttp.ClientSession()
 
 
 bot.config = Pyson(str(config_path))
@@ -122,14 +136,5 @@ bot.add_cog(Bot_Settings(bot))
 bot.add_cog(Bot_Logging(bot))
 bot.add_cog(Utils(bot))
 load_extensions()
-
-
-@bot.event
-async def on_error(event, *args, **kwargs):
-    try:
-        raise
-    except Exception as error:
-        tb = traceback.format_exc()
-        await log_error(error, event, tb=tb, **kwargs)
-
+bot.loop.create_task(create_aiohttp())
 bot.run(settings.data.get('token'))

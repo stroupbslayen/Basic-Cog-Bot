@@ -11,11 +11,11 @@ if not os.path.isfile('./cogs/data/log_config.json'):
     make = Pyson('./cogs/data/log_config')
     make.data = {
         'log_level': logging.INFO,
-        'log_error': True,
-        'log_message': True,
-        'log_message_edit': True,
-        'log_command': True,
-        'log_command_error': True,
+        'log_error': False,
+        'log_message': False,
+        'log_message_edit': False,
+        'log_command': False,
+        'log_command_error': False,
         'traceback': False
     }
     make.save

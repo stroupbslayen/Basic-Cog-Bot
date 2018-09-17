@@ -1,6 +1,6 @@
 # Basic-Cog-Bot
 
-Basically, I wanted to make a bot that doesn't require much though for new people. It's got some logging and 'database' functionality for json. This is the basic setup for the bot I run on my server. It's made for a single server so put it on multiple servers at your own risk. I'll update it when I want to add something or I'm made aware of an issue. All of the cogs on my github will be made to run in this bot base.
+Basically, I wanted to make a bot that doesn't require much thought for new people. It's got some logging and 'database' functionality for json. This is the basic setup for the bot I run on my server. It's made for a single server so put it on multiple servers at your own risk. I'll update it when I want to add something or I'm made aware of an issue. All of the cogs on my github will be made to run in this bot base.
 
 # Getting Started
 - Clone the repo and install the requirements with `pip`.

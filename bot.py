@@ -42,7 +42,7 @@ class Utils:
         print(f'Logged in as: {self.bot.user.name}')
         print(f'With user ID: {self.bot.user.id}')
 
-    @checks.is_owner()
+    @checks.bot_owner()
     @commands.command()
     async def shutdown(self, ctx):
         ''': Shutdown the bot'''
@@ -52,7 +52,7 @@ class Utils:
         await self.bot.close()
 
     # unload an extension
-    @checks.is_owner()
+    @checks.bot_owner()
     @commands.command()
     async def unload(self, ctx, cog: str = None):
         ''': Unload an extension'''
@@ -63,7 +63,7 @@ class Utils:
             await ctx.channel.send('Invalid Extension Name!')
 
     # load an extension
-    @checks.is_owner()
+    @checks.bot_owner()
     @commands.command()
     async def load(self, ctx, cog: str = None):
         ''': Load an extension'''
@@ -74,7 +74,7 @@ class Utils:
             await ctx.channel.send('Invalid Extension Name!')
 
     # reload an extension
-    @checks.is_owner()
+    @checks.bot_owner()
     @commands.command(name='reload')
     async def _reload(self, ctx, cog: str = None):
         ''': Reload an extension'''

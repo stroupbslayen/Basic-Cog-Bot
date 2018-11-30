@@ -24,30 +24,36 @@ from discord.ext import commands
 from ..utils import Pyson
 
 
-def check_owner(ctx):
-    coowners = Pyson('cogs/data/config').data.get('coowners', [])
-    author = ctx.author.id
-    owner = ctx.message.guild.owner.id
-    if author in coowners or author == owner:
-        return True
-    return False
+def bot_owner():
+    'Checks for if the user is the bot owner or a coowner'
+    async def predicate(ctx):
+        coowners = Pyson('cogs/data/config').data.get('coowners', [])
+        bot = await ctx.bot.application_info()
+        if ctx.author.id in coowners:
+            return True
+        if ctx.author == bot.owner:
+            return True
+    return commands.check(predicate)
 
 
-def is_owner():
-    '''Checks if the message author is the server owner or a coowner'''
+def server_owner():
+    '''Checks if the message author is the server owner'''
     def predicate(ctx):
-        return check_owner(ctx)
+        if not ctx.guild:
+            return False
+        if ctx.author is ctx.guild.owner:
+            return True
+        return False
     return commands.check(predicate)
 
 
 def is_admin():
-    '''Checks if the message author is the owner or has admin perms'''
+    '''Checks if the message author admin perms'''
     def predicate(ctx):
+        if not ctx.guild:
+            return False
         author = ctx.author
-        if check_owner(ctx):
-            return True
         if ('administrator', True) in author.guild_permissions:
             return True
-        else:
-            return False
+        return False
     return commands.check(predicate)

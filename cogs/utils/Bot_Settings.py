@@ -8,16 +8,17 @@ class Bot_Settings():
     def __init__(self, bot):
         self.bot = bot
 
-    @checks.is_owner()
+    @checks.bot_owner()
     @commands.command(aliases=['sp'])
-    async def set_prefix(self, ctx, prefix: str = '!'):
-        ''': Change the prefix for using bot commands'''
+    async def set_prefix(self, ctx, *, prefix: str = '!'):
+        ''': Change the prefix for using bot commands. This will overwrite all prefixes.'''
+        prefix = prefix.split(' ')
         self.bot.command_prefix = prefix
         self.bot.config.data['Bot Settings']['command_prefix'] = prefix
         self.bot.config.save
-        await ctx.channel.send(f'Commands will now be called with **{prefix}**')
+        await ctx.channel.send(f'Commands will now be called with **{", ".join(prefix)}**')
 
-    @checks.is_owner()
+    @checks.bot_owner()
     @commands.command(name='toggle_traceback')
     async def _print_traceback(self, ctx):
         ''': Toggle printing the traceback for debugging'''
@@ -25,7 +26,7 @@ class Bot_Settings():
         self.bot.config.save
         await ctx.channel.send(f'Traceback is now: {human.get(str(self.bot.config.data.get("traceback")))}')
 
-    @checks.is_owner()
+    @checks.bot_owner()
     @commands.command()
     async def change_description(self, ctx, *, description: str=''):
         ''': Change the description for the bot displayed in the help menu'''
@@ -34,7 +35,7 @@ class Bot_Settings():
         self.bot.config.save
         await ctx.channel.send(f'The bots description is now ```{description}```')
 
-    @checks.is_owner()
+    @checks.bot_owner()
     @commands.command()
     async def toggle_help(self, ctx):
         ''': Toggle how the bot send the help menu in a pm'''
@@ -46,7 +47,7 @@ class Bot_Settings():
         else:
             await ctx.channel.send('The help menu will be posted locally.')
 
-    @checks.is_owner()
+    @checks.bot_owner()
     @commands.command()
     async def add_coowner(self, ctx, member: discord.Member=None):
         ''': Add a co-owner to your server
@@ -62,7 +63,7 @@ class Bot_Settings():
                 config.save
                 await ctx.channel.send(f'{member.mention} has been added as a co-owner!')
 
-    @checks.is_owner()
+    @checks.bot_owner()
     @commands.command()
     async def remove_coowner(self, ctx, member: discord.Member=None):
         ': Remove a co-owner from your server'
@@ -77,12 +78,12 @@ class Bot_Settings():
                 config.save
                 await ctx.channel.send(f'{member.mention} has been removed from co-owners!')
 
-    @checks.is_owner()
+    @checks.bot_owner()
     @commands.command()
     async def coowners(self, ctx):
         ': Check the co-owners of the server'
         coowners = ''
         for coowner in self.bot.config.data.get('coowners', []):
-            coowners += f'{ctx.message.guild.get_user(coowner).mention}\n'
+            coowners += f'{ctx.bot.get_user(coowner)}\n'
         embed = discord.Embed(title='Co-Owners', description=coowners)
         await ctx.channel.send(embed=embed)

@@ -91,7 +91,7 @@ class Bot_Logging:
                       f'Command: {ctx.invoked_with}')
         return True
 
-    @checks.is_owner()
+    @checks.bot_owner()
     @commands.group(pass_context=True)
     async def toggle_log(self, ctx):
         ''': Toggle what the bot will log'''

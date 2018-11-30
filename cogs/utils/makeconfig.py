@@ -7,7 +7,7 @@ class MakeConfig:
     def __init__(self, config_path="config"):
         self.config = Pyson(config_path)
         self.token = None
-        self.prefix = '!'
+        self.prefix = ['!']
         self.description = None
         self.pm_help = False
         self.case_insensitive = False
@@ -27,12 +27,10 @@ class MakeConfig:
 
     def get_info(self):
         self.token = input('Please enter your discord bot token: ')
-        prefix = input(
-            'Please enter the prefix you would like to use (default is !): ')
+        prefix = input('Please enter the prefix you would like to use. Multiple separate multiple prefixes with a space. (default is !): ')
         if prefix:
-            self.prefix = prefix
-        description = input(
-            'Please enter you bots description (optional):  ')
+            self.prefix = prefix.split(' ')
+        description = input('Please enter you bots description (optional):  ')
         self.description = f'''{description}'''
         pm = input('Would you like the help menu to be sent in a PM? (y/n): ')
         if pm.lower() in ['y', 'yes']:

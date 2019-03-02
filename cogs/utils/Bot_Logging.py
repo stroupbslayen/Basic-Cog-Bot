@@ -46,7 +46,7 @@ human = {
 }
 
 
-class Bot_Logging:
+class Bot_Logging(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -54,6 +54,7 @@ class Bot_Logging:
         self.bot.logging = Pyson('./cogs/data/log_config')
         LOGS.setLevel(self.bot.logging.data['log_level'])
 
+    @commands.Cog.listener()
     async def on_message(self, message):
         if self.bot.logging.data['log_message']:
             if message.author.id != self.bot.user.id:
@@ -62,6 +63,7 @@ class Bot_Logging:
                           f'Author_id: {message.author.id} '
                           f'Message: {message.content}')
 
+    @commands.Cog.listener()
     async def on_message_edit(self, before, after):
         if self.bot.logging.data['log_message_edit']:
             if before.author.id != self.bot.user.id:
@@ -71,6 +73,7 @@ class Bot_Logging:
                           f'Original: {before.content} '
                           f'Edited: {after.content}')
 
+    @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if self.bot.config.data.get('traceback'):
             await commands.bot.BotBase(self.bot).on_command_error(ctx, error)

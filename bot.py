@@ -2,12 +2,13 @@ import os
 from pathlib import Path
 from datetime import datetime
 import traceback
+import aiohttp
 from discord.ext import commands
 import discord
 if not os.path.isdir('cogs/data'):
     os.makedirs('cogs/data')
 from cogs.utils import Pyson, MakeConfig, checks, syscheck, log_error, Bot_Logging, Bot_Settings
-import aiohttp
+
 
 syscheck()
 
@@ -31,13 +32,14 @@ async def on_error(event, *args, **kwargs):
         await log_error(error, event, tb=tb, **kwargs)
 
 
-class Utils:
+class Utils(commands.Cog):
     '''Some useful utils for the discord bot'''
 
     def __init__(self, bot):
         self.bot = bot
         self.bot.starttime = datetime.now()
 
+    @commands.Cog.listener()
     async def on_ready(self):
         print(f'Logged in as: {self.bot.user.name}')
         print(f'With user ID: {self.bot.user.id}')
@@ -109,12 +111,11 @@ def load_settings():
 # pull all extensions from the cogs folder
 def load_extensions():
     bot.startup_extensions = []
-    path = Path('./cogs')
-    for dirpath, dirnames, filenames in os.walk(path):
-        if dirpath.strip('./') == str(path):
-            for cog in filenames:
-                extension = 'cogs.'+cog[:-3]
-                bot.startup_extensions.append(extension)
+    path = Path('cogs').glob('*.py')
+    for cog in path:
+        extension = f'cogs.{cog.name[:3]}'
+        print(extension)
+        bot.startup_extensions.append(extension)
 
     # load cogs from extensions
     if __name__ == "__main__":
@@ -123,12 +124,12 @@ def load_extensions():
                 bot.load_extension(extension)
                 print(f'Loaded {extension}')
             except Exception as e:
+                bot.startup_extensions.remove(extension)
                 print(f'Failed to load extension {extension}\n{e}')
 
 
 # create an aiohttp session that cogs can use
-async def create_aiohttp():
-    bot.aiohttp = aiohttp.ClientSession()
+bot.aiohttp = aiohttp.ClientSession(loop=bot.loop)
 
 
 bot.config = Pyson(str(config_path))
@@ -136,5 +137,4 @@ bot.add_cog(Bot_Settings(bot))
 bot.add_cog(Bot_Logging(bot))
 bot.add_cog(Utils(bot))
 load_extensions()
-bot.loop.create_task(create_aiohttp())
 bot.run(settings.data.get('token'))

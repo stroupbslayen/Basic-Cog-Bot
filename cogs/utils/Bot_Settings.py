@@ -4,7 +4,7 @@ from . import checks
 from .Bot_Logging import human
 
 
-class Bot_Settings():
+class Bot_Settings(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

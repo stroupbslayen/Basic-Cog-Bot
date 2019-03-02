@@ -113,9 +113,7 @@ def load_extensions():
     bot.startup_extensions = []
     path = Path('cogs').glob('*.py')
     for cog in path:
-        extension = f'cogs.{cog.name[:3]}'
-        print(extension)
-        bot.startup_extensions.append(extension)
+        bot.startup_extensions.append(f'cogs.{cog.name[:-3]}')
 
     # load cogs from extensions
     if __name__ == "__main__":

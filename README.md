@@ -14,5 +14,5 @@ Basically, I wanted to make a bot that doesn't require much thought for new peop
 
 # Notes
 - Python 3.6 is required.
-- This bot is built on [discord.py rewite](https://github.com/Rapptz/discord.py/tree/rewrite). Be aware of this when you're looking for tutorials on how to make a cog or use discord.py.
-- [Documentation](http://discordpy.readthedocs.io/en/rewrite/index.html) for using discord.py rewrite.
+- This bot is built on [discord.py rewite](https://github.com/Rapptz/discord.py). Be aware of this when you're looking for tutorials on how to make a cog or use discord.py.
+- [Documentation](https://discordpy.readthedocs.io/en/latest/) for using discord.py rewrite.
